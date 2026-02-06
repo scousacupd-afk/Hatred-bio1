@@ -161,5 +161,27 @@
     </div>
   </div>
 
+<audio id="bg-music" loop muted>
+  <source src="https://open.spotify.com/track/2jIS2x5DswnvyYFG0sCPDs?si=a3f156586b1241b1" type="audio/mpeg">
+</audio>
+
+<script>
+  const music = document.getElementById("bg-music");
+  const card = document.querySelector(".card");
+
+  // Attempt autoplay (muted)
+  music.play().catch(() => {});
+
+  card.addEventListener("click", () => {
+    if (music.paused) {
+      music.muted = false;
+      music.play();
+    } else {
+      music.pause();
+    }
+  });
+</script>
+
+  
 </body>
 </html>
