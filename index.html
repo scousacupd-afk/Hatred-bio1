@@ -1,196 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bio</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>hatred</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at top left, #ED5402, #000);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FF5500;
-    }
+:root{
+  --p:#a855f7;
+  --p2:#7c3aed;
+  --p3:#c084fc;
+  --bg:#04000d;
+  --card:#07000f;
+  --border:rgba(168,85,247,0.18);
+  --dim:rgba(168,85,247,0.08);
+}
 
-    .card {
-      position: relative;
-      width: 380px;
-      padding: 22px;
-      border-radius: 14px;
-      background: rgba(10, 10, 10, 0.75);
-      backdrop-filter: blur(12px);
-    }
+html,body{height:100%;overflow:hidden}
 
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      padding: 1.5px;
-      border-radius: inherit;
-      background: linear-gradient(
-        135deg,
-        #FF5500,
-        #7c7cff,
-        #FF0000
-      );
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
+body{
+  background:var(--bg);
+  font-family:'JetBrains Mono',monospace;
+  display:flex;align-items:center;justify-content:center;
+  color:#ccc;
+  position:relative;
+}
 
-    .header {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
+/* ── CANVAS BG ── */
+#c{position:fixed;inset:0;z-index:0}
 
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+/* ── OUTER SHELL ── */
+.shell{
+  position:relative;z-index:10;
+  display:flex;
+  width:min(860px,96vw);
+  min-height:480px;
+  border:1px solid var(--border);
+  background:rgba(4,0,13,0.78);
+  backdrop-filter:blur(20px);
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(168,85,247,0.06),
+    0 0 60px rgba(120,0,220,0.25),
+    0 0 140px rgba(100,0,200,0.12);
+}
 
-    .name {
-      font-size: 18px;
-      font-weight: 600;
-    }
+/* animated border shimmer */
+.shell::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(168,85,247,0.12) 50%,transparent 100%);
+  background-size:200% 100%;
+  animation:shimmer 4s linear infinite;
+  pointer-events:none;z-index:1;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-    .handle {
-      font-size: 13px;
-      color: #FF0000;
-    }
+/* ── LEFT PANEL ── */
+.left{
+  width:260px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  padding:40px 28px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  position:relative;
+  background:rgba(80,0,160,0.04);
+}
 
-    .badges {
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-    }
+/* vertical label */
+.left-label{
+  position:absolute;top:50%;right:-1px;
+  transform:translateY(-50%) rotate(90deg);
+  font-size:8px;letter-spacing:4px;color:rgba(168,85,247,0.3);
+  text-transform:uppercase;white-space:nowrap;
+}
 
-    .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: #FF00F7;
-      color: #FF0000;
-    }
+/* avatar */
+.av-wrap{
+  position:relative;
+  width:100px;height:100px;
+  margin-bottom:22px;
+}
 
-    .bio {
-      margin-top: 16px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #02ED50;
-    }
+.av-ring{
+  position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid rgba(168,85,247,0.4);
+  animation:spin 8s linear infinite;
+}
+.av-ring::before{
+  content:'';position:absolute;
+  top:-3px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;border-radius:50%;
+  background:var(--p);
+  box-shadow:0 0 10px var(--p),0 0 20px var(--p);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    .section {
-      margin-top: 18px;
-      padding: 12px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.03);
-      font-size: 13px;
-    }
+.av-inner{
+  width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#1e004a,#08001a);
+  border:1px solid rgba(168,85,247,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:32px;
+  color:var(--p);
+  text-shadow:0 0 20px var(--p);
+  cursor:pointer;overflow:hidden;position:relative;
+  transition:border-color 0.2s;
+}
+.av-inner:hover{border-color:var(--p)}
+.av-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;display:none}
+.av-inner input{display:none}
 
-    .footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #FF5500;
-    }
-  </style>
+/* name */
+.uname{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:22px;color:#f0e0ff;letter-spacing:1px;
+  text-align:center;margin-bottom:6px;
+  text-shadow:0 0 18px rgba(168,85,247,0.5);
+}
+
+.utag{
+  font-size:9px;letter-spacing:3px;color:var(--p);
+  text-transform:uppercase;margin-bottom:28px;
+  opacity:0.8;
+}
+
+/* stat blocks */
+.stats{width:100%;display:flex;flex-direction:column;gap:1px;margin-bottom:28px}
+
+.stat{
+  background:var(--dim);
+  padding:10px 12px;
+  border:1px solid rgba(168,85,247,0.08);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+.stat-label{font-size:8px;letter-spacing:2px;color:rgba(168,85,247,0.5);text-transform:uppercase}
+.stat-val{font-size:10px;color:#d8b4fe;letter-spacing:1px}
+
+/* online dot */
+.online{
+  display:flex;align-items:center;gap:7px;
+  font-size:9px;letter-spacing:2px;color:rgba(100,255,160,0.6);
+  text-transform:uppercase;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 8px #4ade80;
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 8px #4ade80}50%{opacity:0.4;box-shadow:0 0 3px #4ade80}}
+
+/* ── RIGHT PANEL ── */
+.right{
+  flex:1;
+  padding:40px 36px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+
+/* big decorative text */
+.deco{
+  position:absolute;
+  bottom:-20px;right:-10px;
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:110px;color:transparent;
+  -webkit-text-stroke:1px rgba(168,85,247,0.05);
+  pointer-events:none;user-select:none;line-height:1;
+  letter-spacing:-4px;
+}
+
+/* section label */
+.rlabel{
+  font-size:8px;letter-spacing:4px;color:rgba(168,85,247,0.45);
+  text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.rlabel::before{content:'';width:20px;height:1px;background:rgba(168,85,247,0.35)}
+
+/* bio text */
+.bio{
+  font-size:13px;line-height:2;
+  color:rgba(200,170,240,0.8);
+  margin-bottom:30px;
+  position:relative;z-index:2;
+}
+.bio b{color:#e9d5ff;font-weight:500}
+
+/* languages row */
+.langs{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-bottom:32px;position:relative;z-index:2;
+}
+
+.lang{
+  font-size:9px;letter-spacing:1.5px;
+  padding:5px 12px;
+  border:1px solid rgba(168,85,247,0.25);
+  color:rgba(196,132,252,0.7);
+  text-transform:uppercase;
+  position:relative;overflow:hidden;
+  transition:all 0.2s;
+}
+.lang::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(168,85,247,0);
+  transition:background 0.2s;
+}
+.lang:hover{border-color:rgba(168,85,247,0.7);color:#e9d5ff}
+.lang:hover::before{background:rgba(168,85,247,0.1)}
+
+/* crew */
+.crew-section{margin-bottom:32px;position:relative;z-index:2}
+
+.crew-row{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-top:10px;
+}
+
+.crew-pill{
+  font-size:9px;letter-spacing:1px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(168,85,247,0.2);
+  color:rgba(196,132,252,0.6);
+  background:rgba(168,85,247,0.05);
+  transition:all 0.2s;
+}
+.crew-pill:hover{border-color:rgba(168,85,247,0.5);color:#d8b4fe;background:rgba(168,85,247,0.1)}
+
+/* social buttons */
+.socials{
+  display:flex;gap:10px;
+  position:relative;z-index:2;
+}
+
+.soc{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:12px 22px;
+  border:1px solid rgba(168,85,247,0.3);
+  color:#c084fc;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:2px;
+  text-decoration:none;
+  background:rgba(168,85,247,0.05);
+  position:relative;overflow:hidden;
+  transition:all 0.25s;
+}
+
+.soc::after{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,var(--p),transparent);
+  transform:scaleX(0);transition:transform 0.3s;
+}
+.soc:hover{
+  border-color:rgba(168,85,247,0.7);color:#f0e0ff;
+  background:rgba(168,85,247,0.12);
+  box-shadow:0 0 20px rgba(168,85,247,0.2);
+}
+.soc:hover::after{transform:scaleX(1)}
+
+.soc-ico{font-size:14px}
+
+/* corner accents */
+.corner{position:absolute;width:12px;height:12px}
+.corner.tl{top:0;left:0;border-top:1.5px solid var(--p);border-left:1.5px solid var(--p)}
+.corner.tr{top:0;right:0;border-top:1.5px solid var(--p);border-right:1.5px solid var(--p)}
+.corner.bl{bottom:0;left:0;border-bottom:1.5px solid var(--p);border-left:1.5px solid var(--p)}
+.corner.br{bottom:0;right:0;border-bottom:1.5px solid var(--p);border-right:1.5px solid var(--p)}
+
+/* ── SPOTIFY ── */
+.spotify-wrap{
+  width:100%;
+  margin-top:20px;
+  border:1px solid rgba(168,85,247,0.15);
+  overflow:hidden;
+  position:relative;
+}
+
+.spotify-label{
+  font-size:8px;letter-spacing:3px;color:rgba(168,85,247,0.4);
+  text-transform:uppercase;padding:8px 10px 6px;
+  border-bottom:1px solid rgba(168,85,247,0.08);
+  display:flex;align-items:center;gap:6px;
+}
+
+.spotify-label::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:#1db954;box-shadow:0 0 6px #1db954;
+  animation:blink 2s ease-in-out infinite;
+}
+
+.spotify-wrap iframe{
+  display:block;width:100%;border:none;
+  filter:hue-rotate(200deg) saturate(0.7) brightness(0.9);
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .shell{flex-direction:column;width:96vw;min-height:unset;overflow-y:auto}
+  html,body{overflow:auto;height:auto}
+  .left{width:100%;border-right:none;border-bottom:1px solid var(--border);padding:32px 24px}
+  .left-label{display:none}
+  .right{padding:28px 24px}
+  .deco{font-size:70px}
+}
+</style>
 </head>
 <body>
 
-  <div class="card">
-    <div class="header">
-      <img
-        class="avatar"
-        src="https://cdn.discordapp.com/avatars/1444467169990672584/42590dd2dee2db4935674c6c8f880f36.webp?size=1024"
-        alt="avatar"
-      />
-      <div>
-        <div class="name">Hatred</div>
-        <div class="handle">@Hatredisback</div>
-        <div class="badges">
-          <div class="badge">Verified</div>
-          <div class="badge">Dev</div>
-        </div>
+<canvas id="c"></canvas>
+
+<div class="shell">
+  <!-- corner accents on shell -->
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="left-label">profile.exe</div>
+
+    <div class="av-wrap">
+      <div class="av-ring"></div>
+      <div class="av-inner" id="avBox" title="click to upload">
+        H
+        <img id="avImg" alt=""/>
+        <input type="file" id="avFile" accept="image/*"/>
       </div>
     </div>
 
-    <div class="bio">
-      <strong>Bio</strong><br />
-      ✨ apk method dev • c++ / c# • / PY<br />
-      no i will not teach u how to dev or mod
-      ------------------
-      [discord servers here]
-      ------------------
-      discord.gg/titletagvr
-      discord.gg/oggorillatag
-      discord.gg/ctag
+    <div class="uname">Hatred</div>
+    <div class="utag">cheat maker</div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">status</span>
+        <span class="stat-val">online</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">What im good at</span>
+        <span class="stat-val">C# · C++ · PY</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">mode</span>
+        <span class="stat-val">im high most of the time</span>
+      </div>
     </div>
 
-<iframe
-  style="border-radius:12px; margin-top:12px"
-  src="https://open.spotify.com/embed/track/2jIS2x5DswnvyYFG0sCPDs"
-  width="100%"
-  height="80"
-  frameBorder="0"
-  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-  loading="lazy">
-</iframe>
-
-    <div class="section">
-      <strong>freinds</strong><br />
-      Cammyapp, Rizue, Table, VPN, Koda, Tie, renuled, tlocc, cobb, ella, nala
+    <div class="online">
+      <div class="dot"></div>
+      active now
     </div>
 
-    
-
-        <div class="LINKS">
-      <strong>Links</strong><br />
-      📲 TIKTOK: https://www.tiktok.com/@hatred417,
-      
-       DISCORD: <@1444467169990672584>
-    </div>
-
-    <div class="footer">
-      <span>made by Hatred</span>
-      <span>v1.0.0</span>
+    <div class="spotify-wrap">
+      <div class="spotify-label">now playing</div>
+      <iframe src="https://open.spotify.com/embed/track/2NZueN792gbgxi115MywKf?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
   </div>
 
-<audio id="bg-music" loop muted>
-  <source src="C:\Users\jackb\Downloads\open_spotify_com-2jIS2x5DswnvyYFG0sCPDs.mp3" type="audio/mpeg">
-</audio>
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="deco" aria-hidden="true">H</div>
+
+    <div>
+      <div class="rlabel">about</div>
+      <div class="bio">
+        I make cheats for R6 and CsGo.<br/>
+        i also like<br/>
+        Jaydes, Wifiskeliton, Overtonight, S0rrow
+      </div>
+    </div>
+
+    <div>
+      <div class="rlabel">languages</div>
+      <div class="langs">
+        <span class="lang">C#</span>
+        <span class="lang">C++</span>
+        <span class="lang">Python</span>
+        <span class="lang">HTML</span>
+        <span class="lang">JSON</span>
+      </div>
+    </div>
+
+    <div class="crew-section">
+      <div class="rlabel">crew</div>
+      <div class="crew-row">
+        <span class="crew-pill">cammyapp</span>
+        <span class="crew-pill">nala</span>
+        <span class="crew-pill">renuled</span>
+        <span class="crew-pill">tie</span>
+        <span class="crew-pill">mpot</span>
+        <span class="crew-pill">rizuejr</span>
+      </div>
+    </div>
+
+    <div class="socials">
+      <a class="soc" href="https://www.tiktok.com/@hatred417" target="_blank" rel="noopener">
+        <span class="soc-ico">🎵</span>tiktok
+      </a>
+      <a class="soc" href="https://discord.gg/RZDbems2sk" target="_blank" rel="noopener">
+        <span class="soc-ico">🏷️</span>null tag
+      </a>
+    </div>
+  </div>
+</div>
 
 <script>
-  const music = document.getElementById("bg-music");
-  const card = document.querySelector(".card");
+// ── BACKGROUND: particles + grid + wave ──
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
 
-  // Attempt autoplay (muted)
-  music.play().catch(() => {});
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+resize(); window.addEventListener('resize', resize);
 
-  card.addEventListener("click", () => {
-    if (music.paused) {
-      music.muted = false;
-      music.play();
-    } else {
-      music.pause();
-    }
+// grid lines
+function drawGrid(t){
+  const s = 50;
+  ctx.lineWidth = 0.5;
+  for(let x = 0; x < canvas.width; x += s){
+    const a = 0.025 + 0.015 * Math.sin(t * 0.0005 + x * 0.02);
+    ctx.strokeStyle = `rgba(120,0,200,${a})`;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+  }
+  for(let y = 0; y < canvas.height; y += s){
+    const a = 0.025 + 0.015 * Math.sin(t * 0.0005 + y * 0.02);
+    ctx.strokeStyle = `rgba(120,0,200,${a})`;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+  }
+}
+
+// particles
+const pts = Array.from({length: 80}, () => ({
+  x: Math.random() * innerWidth,
+  y: Math.random() * innerHeight,
+  vx: (Math.random() - 0.5) * 0.35,
+  vy: (Math.random() - 0.5) * 0.35,
+  r: 0.8 + Math.random() * 1.4,
+  hue: 270 + Math.random() * 40,
+  alpha: 0.2 + Math.random() * 0.5,
+  phase: Math.random() * Math.PI * 2
+}));
+
+function drawParticles(t){
+  pts.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x < 0) p.x = canvas.width;
+    if(p.x > canvas.width) p.x = 0;
+    if(p.y < 0) p.y = canvas.height;
+    if(p.y > canvas.height) p.y = 0;
+
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.001 + p.phase);
+    const a = p.alpha * pulse;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${p.hue}, 100%, 70%, ${a})`;
+    ctx.shadowColor = `hsl(${p.hue}, 100%, 65%)`;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.shadowBlur = 0;
   });
-</script>
 
-  
+  // connect nearby particles
+  for(let i = 0; i < pts.length; i++){
+    for(let j = i+1; j < pts.length; j++){
+      const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < 90){
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = `rgba(150,0,255,${0.08 * (1 - dist/90)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+// wave at bottom
+function drawWave(t){
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+  for(let x = 0; x <= canvas.width; x += 4){
+    const y = canvas.height - 60 + 30 * Math.sin(x * 0.012 + t * 0.0015) + 20 * Math.sin(x * 0.022 - t * 0.001);
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(100,0,180,0.04)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(168,85,247,0.08)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+// floating scanline
+function drawScanline(t){
+  const y = (t * 0.06) % (canvas.height + 20);
+  const g = ctx.createLinearGradient(0, y-4, 0, y+4);
+  g.addColorStop(0, 'transparent');
+  g.addColorStop(0.5, 'rgba(168,85,247,0.04)');
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, y-4, canvas.width, 8);
+}
+
+(function loop(t){
+  requestAnimationFrame(loop);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawGrid(t);
+  drawWave(t);
+  drawParticles(t);
+  drawScanline(t);
+})(0);
+
+// ── AVATAR ──
+document.getElementById('avBox').addEventListener('click', () => document.getElementById('avFile').click());
+document.getElementById('avFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const img = document.getElementById('avImg');
+  img.src = URL.createObjectURL(f);
+  img.style.display = 'block';
+  document.getElementById('avBox').childNodes[0].textContent = '';
+});
+</script>
 </body>
 </html>
