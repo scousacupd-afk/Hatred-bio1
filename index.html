@@ -362,7 +362,16 @@ body{
 
     <div class="spotify-wrap">
       <div class="spotify-label">now playing</div>
-      <iframe src="https://open.spotify.com/embed/track/2NZueN792gbgxi115MywKf?utm_source=generator&theme=0&autoplay=1" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <audio id="bgAudio" autoplay loop style="display:none">
+        <source src="_29__loser_club_-_YouTube_and_4_more_pages_-_Personal_-_Microsoft__Edge_2026-03-24_14-43-00.mp3" type="audio/mpeg"/>
+      </audio>
+      <div style="padding:10px;display:flex;align-items:center;gap:10px;">
+        <button onclick="const a=document.getElementById('bgAudio');a.paused?a.play():a.pause();this.textContent=a.paused?'▶':'⏸'" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);color:#c084fc;font-size:14px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⏸</button>
+        <div>
+          <div style="font-size:9px;color:#d8b4fe;letter-spacing:1px;">Loser Club</div>
+          <div style="font-size:8px;color:rgba(168,85,247,0.5);letter-spacing:1px;margin-top:2px;">now playing</div>
+        </div>
+      </div>
     </div>
   </div>
 
