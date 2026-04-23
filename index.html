@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hatred's bio</title>
+  <title>nala's bio</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -25,7 +25,6 @@
       overflow: hidden;
     }
 
-    /* Animated starfield background */
     .stars {
       position: fixed;
       inset: 0;
@@ -47,7 +46,6 @@
       50% { opacity: var(--o); }
     }
 
-    /* Floating blobs */
     .blob {
       position: fixed;
       border-radius: 50%;
@@ -63,7 +61,6 @@
     @keyframes blobmove2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-40px)} }
     @keyframes blobmove3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
 
-    /* ---- ENTER SCREEN ---- */
     #enter-screen {
       position: fixed;
       inset: 0;
@@ -129,7 +126,6 @@
     .enter-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
     .enter-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
-    /* ---- MUTE BUTTON ---- */
     #mute-btn {
       position: fixed;
       top: 16px;
@@ -156,7 +152,6 @@
     #mute-btn:hover { background: rgba(20,20,80,0.9); border-color: var(--accent); }
     .mute-icon { font-size: 1rem; }
 
-    /* ---- BIO CONTENT ---- */
     #bio {
       position: relative;
       z-index: 10;
@@ -267,13 +262,11 @@
 </head>
 <body>
 
-  <!-- Stars -->
   <div class="stars" id="stars"></div>
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>
   <div class="blob blob3"></div>
 
-  <!-- Enter Screen -->
   <div id="enter-screen" onclick="enterBio()">
     <div class="enter-border"></div>
     <div class="enter-corner tl"></div>
@@ -285,13 +278,11 @@
     </div>
   </div>
 
-  <!-- Mute Button -->
   <button id="mute-btn" onclick="toggleMute()">
     <span class="mute-icon" id="mute-icon">🔊</span>
     <span id="mute-label">Mute</span>
   </button>
 
-  <!-- Bio -->
   <div id="bio">
     <div class="bio-card">
       <div class="bio-header">Welcome to Hatred's Bio</div>
@@ -306,9 +297,9 @@
       </div>
 
       <div class="bio-row">
-        <span class="bio-emoji">❤️</span>
+        <span class="bio-emoji">💙</span>
         <div>
-          <div class="bio-label">MY GF <3</div>
+          <div class="bio-label">name</div>
           <div class="bio-value" style="color:#ff4444;">nala &lt;3</div>
         </div>
       </div>
@@ -328,28 +319,30 @@
       </div>
 
       <div class="bio-row">
+        <span class="bio-emoji">🎮</span>
+        <div>
+          <div class="bio-label">my 17 digit if u want it &lt;3</div>
+          <div class="bio-value"><a href="https://gofile.io/d/M2rTaB" target="_blank" style="color:#9698ff; text-decoration:none;">click here</a></div>
+        </div>
+      </div>
+
+      <div class="bio-row">
         <span class="bio-emoji">🫂</span>
         <div>
           <div class="bio-label">best friends</div>
           <div class="bsf-input-wrap">
-            <div class="bsf-text">Cammyapp, Z4eu, Vader, Desk, Hexa, L1rson, cobb, ella, rytec</div>
+            <div class="bsf-text">Cammyapp, Z4eu, Vader, Desk, Hexa, L1rson</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Audio -->
   <audio id="bg-music" loop>
-    <!-- 
-      To add your own music, replace the src below with a direct link to an .mp3 file.
-      Example: <source src="https://yourlink.com/song.mp3" type="audio/mpeg">
-    -->
     <source src="https://files.catbox.moe/8iel9m.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    // Generate stars
     const starsEl = document.getElementById('stars');
     for (let i = 0; i < 120; i++) {
       const s = document.createElement('div');
@@ -373,7 +366,7 @@
       document.getElementById('enter-screen').classList.add('hidden');
       document.getElementById('bio').classList.add('visible');
       document.getElementById('mute-btn').classList.add('visible');
-      audio.volume = 0.2;
+      audio.volume = 0.4;
       audio.play().catch(() => {});
     }
 
@@ -384,7 +377,6 @@
       document.getElementById('mute-label').textContent = muted ? 'Unmute' : 'Mute';
     }
 
-    // Also allow Enter key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') enterBio();
     });
