@@ -1,543 +1,386 @@
-import requests
-import random
-from flask import Flask, jsonify, request
-import json
-import os
-import base64
-
-class GameInfo:
-    def __init__(self):
-        self.TitleId: str = "1DA2C"
-        self.SecretKey: str = "HNH1XX146IRFMI47W5X8N85CO7EYGU5KA5Y7ATW4619COCFDE1"
-        self.ApiKey: str = "OC|34606118765698723|eed22a47cc74b8e387580d7c672eba89"
-
-    def get_auth_headers(self):
-        return {"content-type": "application/json", "X-SecretKey": self.SecretKey}
-# SIGMER BACKEND FOR S4GE BOOSTERS MADE BY S4GE AND ADDED ON BY L1RSON :)
-# PLEASE GIVE CREDITS TO S4GE IF YOU USE THIS BACKEND!
-# I COMBINED S4GES PHOTON AUTH AND HIS PLAYFABAUTHENTICATION INTO A WHOLE BACKEND SO YOU CAN JUST PASTE AND RUN IT :)
-# THIS IS UNTESTED SO PLEASE LET @l1r_son KNOW IF THERE'S ANY ISSUES!
-
-settings = GameInfo()
-app = Flask(__name__)
-
-def ReturnFunctionJson(data, funcname, funcparam={}):
-    rjson = data["FunctionParameter"]
-    userId: str = rjson.get("CallerEntityProfile").get("Lineage").get(
-        "TitlePlayerAccountId")
-
-    req = requests.post(
-        url=f"https://{settings.TitleId}.playfabapi.com/Server/ExecuteCloudScript",
-        json={
-            "PlayFabId": userId,
-            "FunctionName": funcname,
-            "FunctionParameter": funcparam
-        },
-        headers=settings.GetAuthHeaders())
-
-    if req.status_code == 200:
-        return jsonify(
-            req.json().get("data").get("FunctionResult")), req.status_code
-    else:
-        return jsonify({}), req.status_code
-
-
-def GetIsNonceValid(nonce: str, oculusId: str):
-    req = requests.post(
-        url=f'https://graph.oculus.com/user_nonce_validate?nonce=' + nonce +
-        '&user_id=' + oculusId + '&access_token=' + settings.ApiKey,
-        headers={"content-type": "application/json"})
-    return req.json().get("is_valid")
-
-
-def Validate_Orgscoped_Id(orgscope: str) -> bool:
-    """Validate Oculus orgscoped ID"""
-    try:
-        res = requests.get(url=f"https://graph.oculus.com/{orgscope}?access_token={settings.ApiKey}")
-        data = res.json()
-        if data.get("id") == orgscope:
-            print("Orgscope Id Valid")
-            return True
-        return False
-    except:
-        return False
-
-# Funny Lil Youtube Embed Webpage For You Fellas
-@app.route("/", methods=["GET"])
-def main():
-    image_url = "https://youtu.be/lK0sUU0K5SY?si=RAD-aQ-N4XTg5BKC"
-    
-    
-    def get_youtube_embed_url(url):
-        if "youtube.com/watch?v=" in url:
-            video_id = url.split("watch?v=")[1].split("&")[0]
-            return f"https://www.youtube.com/embed/{video_id}?autoplay=1"
-        elif "youtu.be/" in url:
-            video_id = url.split("youtu.be/")[1].split("?")[0]
-            return f"https://www.youtube.com/embed/{video_id}?autoplay=1"
-        return None
-    
-    
-    def get_discord_media_url(url):
-        if "discord.com/attachments/" in url or "cdn.discordapp.com/attachments/" in url:
-            return url
-        return None
-    
-    youtube_embed = get_youtube_embed_url(image_url)
-    discord_media = get_discord_media_url(image_url)
-    
-    if youtube_embed:
-        media_element = f'<iframe src="{youtube_embed}" allowfullscreen></iframe>'
-    else:
-        
-        media_element = f'<img src="{image_url}" alt="Media Content" />'
-    
-    return f"""
-    <html>
-      <head>
-        <title></title>
-        <style>
-          body {{
-            background-color: #111;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-          }}
-          img, iframe {{
-            max-width: 90vw;
-            max-height: 90vh;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            border: none;
-          }}
-          iframe {{
-            width: 80vw;
-            height: 45vw;
-            max-height: 80vh;
-          }}
-        </style>
-      </head>
-      <body>
-        {media_element}
-      </body>
-    </html>
-    """
-
-# Replace https://auth-prod.gtag-cf.com/api/PlayFabAuthentication with this endpoint
-@app.route("/api/PlayFabAuthentication", methods=["POST", "GET"])
-def playfab_authentication():
-    if request.method == "GET":
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    rjson = request.get_json()
-    
-    
-    custom_id = rjson.get("CustomId")
-    app_id = rjson.get("AppId")
-    nonce = rjson.get("Nonce")
-    oculus_id = rjson.get("OculusId")
-    platform = rjson.get("Platform")
-    app_version = rjson.get("AppVersion")
-
-   
-    user_agent = request.headers.get('User-Agent', '')
-    if "UnityPlayer" not in user_agent:
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    
-    if not custom_id or not custom_id.startswith("OCULUS"):
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    if not app_id or app_id != settings.TitleId:
-        return jsonify({
-            "Message": "Request sent for the wrong App ID",
-            "Error": "BadRequest-AppIdMismatch",
-        }), 400
-
-    if not nonce:
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    if not oculus_id:
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    if platform != "Quest":
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-    if app_version == "-1":
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-   
-    try:
-        nonce_response = requests.post(
-            url=f"https://graph.oculus.com/user_nonce_validate",
-            json={
-                "access_token": settings.ApiKey,
-                "nonce": nonce,
-                "user_id": oculus_id
-            },
-            headers={"content-type": "application/json"}
-        )
-        
-        if nonce_response.status_code != 200 or not nonce_response.json().get("is_valid", False):
-            return jsonify({
-                "BanMessage": "Your account has been traced and you have been banned.",
-                "BanExpirationTime": "Indefinite"
-            }), 403
-    except:
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-   
-    if not Validate_Orgscoped_Id(oculus_id):
-        return jsonify({
-            "BanMessage": "Your account has been traced and you have been banned.",
-            "BanExpirationTime": "Indefinite"
-        }), 403
-
-   
-    url = f"https://{settings.TitleId}.playfabapi.com/Server/LoginWithServerCustomId"
-    login_request = requests.post(
-        url=url,
-        json={
-            "ServerCustomId": custom_id,
-            "CreateAccount": True,
-        },
-        headers=settings.get_auth_headers(),
-    )
-
-    if login_request.status_code == 200:
-        data = login_request.json().get("data")
-        session_ticket = data.get("SessionTicket")
-        entity_token = data.get("EntityToken").get("EntityToken")
-        playfab_id = data.get("PlayFabId")
-        entity_type = data.get("EntityToken").get("Entity").get("Type")
-        entity_id = data.get("EntityToken").get("Entity").get("Id")
-
-       
-        link_response = requests.post(
-            url=f"https://{settings.TitleId}.playfabapi.com/Server/LinkServerCustomId",
-            json={
-                "ForceLink": True,
-                "PlayFabId": playfab_id,
-                "ServerCustomId": custom_id,
-            },
-            headers=settings.get_auth_headers(),
-        ).json()
-
-        return jsonify({
-            "PlayFabId": playfab_id,
-            "SessionTicket": session_ticket,
-            "EntityToken": entity_token,
-            "EntityId": entity_id,
-            "EntityType": entity_type,
-        }), 200
-    else:
-        if login_request.status_code == 403:
-            ban_info = login_request.json()
-            if ban_info.get("errorCode") == 1002:
-                ban_message = ban_info.get("errorMessage", "Your account has been traced and you have been banned.")
-                ban_details = ban_info.get("errorDetails", {})
-                ban_expiration_key = next(iter(ban_details.keys()), None)
-                ban_expiration_list = ban_details.get(ban_expiration_key, [])
-                ban_expiration = (
-                    ban_expiration_list[0]
-                    if len(ban_expiration_list) > 0
-                    else "Indefinite"
-                )
-                print(ban_info)
-                return jsonify({
-                    "BanMessage": ban_message,
-                    "BanExpirationTime": ban_expiration,
-                }), 403
-            else:
-                error_message = ban_info.get(
-                    "errorMessage", "Your account has been traced and you have been banned."
-                )
-                return jsonify({
-                    "BanMessage": error_message,
-                    "BanExpirationTime": "Indefinite"
-                }), 403
-        else:
-            return jsonify({
-                "BanMessage": "Your account has been traced and you have been banned.",
-                "BanExpirationTime": "Indefinite"
-            }), 403
-
-# Replace https://auth-prod.gtag-cf.com/api/CachePlayFabId with this endpoint
-@app.route("/api/CachePlayFabId", methods=["POST"])
-def cache_playfab_id():
-    return jsonify({"Message": "Success"}), 200
-
-
-@app.route('/api/TitleData', methods=['POST', 'GET'])
-def titledata():
-    response_data = {
-        
-        "AutoMuteCheckedHours": {
-            "hours": 169
-        },
-        "AutoName_Adverbs": [
-            "Cool", "Fine", "Bald", "Bold", "Half", 
-            "Only", "Calm", "Fab", "Ice", "Mad", 
-            "Rad", "Big", "New", "Old", "Shy"
-        ],
-        "AutoName_Nouns": [
-            "Gorilla", "Chicken", "Darling", "Sloth", "King", 
-            "Queen", "Royal", "Major", "Actor", "Agent", 
-            "Elder", "Honey", "Nurse", "Doctor", "Rebel", 
-            "Shape", "Ally", "Driver", "Deputy"
-        ],
-        "BundleBoardSign": "<color=#ff4141>discord.gg/luckytag</color>",
-        "BundleKioskButton": "<color=#ff4141>discord.gg/luckytag</color>",
-        "BundleKioskSign": "<color=#ff4141>discord.gg/luckytag</color>",
-        "BundleLargeSign": "<color=#ff4141>discord.gg/luckytag</color>",
-        "EmptyFlashbackText": "discord.gg/luckytag",
-        "EnableCustomAuthentication": True,
-        "GorillanalyticsChance": 4320,
-        "LatestPrivacyPolicyVersion": "2024.09.20",
-        "LatestTOSVersion": "2024.09.20",
-        "CreditsData": [{"Title": "DEV TEAM", "Entries": ["<color=red>DESK</color>\n<color=red>WHATDOIDO</color><color=red>L1RSON</color>\n<color=red>HATRED</color>"]}],
-        "MOTD": "<color=white>WELCOME TO LUCKY TAG!</color>\n<color=cyan>JOIN OUR DISCORD AT DISCORD.GG/LUCKYTAG TO SUPPORT OUR GAME!</color>\n\n<color=yellow>GAME CREATOR: DESK</color>\n<color=orange>OUR CURRENT GAME UPDATE IS XMAS 2023</color>\n\n<color=purple>JOIN OUR DISCORD AND BOOST IT 1X FOR EVERYCOSMETIC (NO STAFF)</color>",
-        "SeasonalStoreBoardSign": "<color=#80ff00>RATE THE GAME 5 STARS!</color>\n\n<color=#00ff88>.GG/luckytag</color>",
-        "TOS_2024.09.20": "discord.gg/luckytag",
-        "TOBAlreadyOwnCompTxt": "discord.gg/luckytag",
-        "TOBAlreadyOwnPurchaseBundle": "discord.gg/luckytag",
-        "TOBDefCompTxt": "discord.gg/luckytag",
-        "TOBDefPurchaseBtnDefTxt": "discord.gg/luckytag",
-        "UseLegacyIAP": False
- }
-    return jsonify(response_data)
-# Replace https://iap.gtag-cf.com/api/ConsumeOculusIAP with this endpoint
-@app.route("/api/ConsumeOculusIAP", methods=["POST"])
-def consume_oculus_iap():
-    rjson = request.get_json()
-
-    access_token = rjson.get("userToken")
-    user_id = rjson.get("userID")
-    nonce = rjson.get("nonce")
-    sku = rjson.get("sku")
-
-    response = requests.post(
-        url=f"https://graph.oculus.com/consume_entitlement?nonce={nonce}&user_id={user_id}&sku={sku}&access_token={settings.ApiKey}",
-        headers={"content-type": "application/json"},
-    )
-
-    if response.json().get("success"):
-        return jsonify({"result": True})
-    else:
-        return jsonify({"error": True})
-
-@app.route("/api/GetAcceptedAgreements", methods=['POST', 'GET'])
-def GetAcceptedAgreements():
-  data = request.json
-
-  return jsonify({"PrivacyPolicy":"1.1.28","TOS":"11.05.22.2"}), 200
-
-@app.route("/api/SubmitAcceptedAgreements", methods=['POST', 'GET'])
-def SubmitAcceptedAgreements():
-  data = request.json
-
-  return jsonify({}), 200
-
-@app.route("/api/ConsumeCodeItem", methods=["POST"])
-def consume_code_item():
-    rjson = request.get_json()
-    code = rjson.get("itemGUID")
-    playfab_id = rjson.get("playFabID")
-    session_ticket = rjson.get("playFabSessionTicket")
-
-    if not all([code, playfab_id, session_ticket]):
-        return jsonify({"error": "Missing parameters"}), 400
-
-    raw_url = f"https://github.com/redapplegtag/backendsfrr" # make a github and put the raw here (Redeemed = not redeemed, u have to add discord webhookss and if your smart you can make it so it auto updates the github url (redeemed is not redeemed, AlreadyRedeemed is already redeemed, then dats it
-    # code:Redeemed 
-    response = requests.get(raw_url)
-
-    if response.status_code != 200:
-        return jsonify({"error": "GitHub fetch failed"}), 500
-
-    lines = response.text.splitlines()
-    codes = {split[0].strip(): split[1].strip() for line in lines if (split := line.split(":")) and len(split) == 2}
-
-    if code not in codes:
-        return jsonify({"result": "CodeInvalid"}), 404
-
-    if codes[code] == "AlreadyRedeemed":
-        return jsonify({"result": codes[code]}), 200
-
-    grant_response = requests.post(
-        f"https://{settings.TitleId}.playfabapi.com/Admin/GrantItemsToUsers",
-        json={
-            "ItemGrants": [
-                {
-                    "PlayFabId": playfab_id,
-                    "ItemId": item_id,
-                    "CatalogVersion": "DLC"
-                } for item_id in ["dis da cosmetics", "anotehr cposmetic", "anotehr"]
-            ]
-        },
-        headers=settings.get_auth_headers()
-    )
-
-
-    if grant_response.status_code != 200:
-        return jsonify({"result": "PlayFabError", "errorMessage": grant_response.json().get("errorMessage", "Grant failed")}), 500
-
-    new_lines = [f"{split[0].strip()}:AlreadyRedeemed" if split[0].strip() == code else line.strip() 
-             for line in lines if (split := line.split(":")) and len(split) >= 2]
-
-    updated_content = "\n".join(new_lines).strip()
-
-    return jsonify({"result": "Success", "itemID": code, "playFabItemName": codes[code]}), 200
-
-@app.route('/api/v2/GetName', methods=['POST', 'GET'])
-def GetNameIg():
-    return jsonify({"result": f"GORILLA{random.randint(1000,9999)}"})
-
-# Put your backend URL with this endpoint /api/photon into your photon and photon voice custom server!
-@app.route("/api/photon", methods=["POST", "GET"])
-def photonauth():
-    if request.method == "GET":
-        userid = request.args.get("username")
-        token = request.args.get("token")
-
-        if not userid or not token:
-            return jsonify({
-                "message": "Missing required parameters",
-                "userid": None,
-                "resultCode": 0,
-                "nickname": None,
-            }), 400
-
-        if "-" not in token or len(token.split("-")[0]) != 16:
-            return jsonify({
-                "message": "Invalid token format",
-                "userid": None,
-                "resultCode": 2,
-                "nickname": None,
-            }), 400
-
-        user_id = token.split("-")[0]
-        account_valid = CheckUserAccount(user_id)
-
-        if account_valid:
-            success, user_data, _ = get_user_from_playfab(user_id)
-            nickname = user_data.get("display_name") if success else None
-            
-            return jsonify({
-                "message": f"Authenticated user {userid}",
-                "userid": user_id.upper(),
-                "resultCode": 1,
-                "nickname": nickname,
-            }), 200
-        else:
-            return jsonify({
-                "message": f"User account not found",
-                "userid": None,
-                "resultCode": 0,
-                "nickname": None,
-            }), 401
-
-    elif request.method == "POST":
-        try:
-            rjson = request.get_json(force=True)
-        except:
-            return jsonify({
-                "message": "Invalid JSON",
-                "userid": None,
-                "resultCode": 0,
-                "nickname": None,
-            }), 400
-        
-        platform = rjson.get("Platform")
-        app_id = rjson.get("AppId")
-        session_ticket = rjson.get("Ticket")
-        username = request.args.get("username")
-
-        if not session_ticket or "-" not in session_ticket:
-            return jsonify({
-                "message": "Invalid session ticket",
-                "userid": None,
-                "resultCode": 2,
-                "nickname": None,
-            }), 400
-
-        user_id = session_ticket.split("-")[0]
-
-        if len(user_id) != 16:
-            return jsonify({
-                "message": "Invalid token",
-                "userid": None,
-                "resultCode": 2,
-                "nickname": None,
-            }), 400
-
-        if app_id != settings.TitleId:
-            return jsonify({
-                "message": "App ID mismatch",
-                "userid": user_id,
-                "resultCode": 3,
-                "nickname": None,
-            }), 403
-
-        if platform not in ["Quest", "Android", "quest", "android"]:
-            return jsonify({
-                "message": f"Platform '{platform}' not supported",
-                "userid": user_id,
-                "resultCode": 3,
-                "nickname": None,
-            }), 403
-
-        # Get user from PlayFab
-        req = requests.post(
-            url=f"https://{settings.TitleId}.playfabapi.com/Server/GetUserAccountInfo",
-            json={"PlayFabId": user_id},
-            headers=settings.get_auth_headers(),
-            timeout=5
-        )
-
-        if req.status_code == 200:
-            data = req.json().get("data", {})
-            nickname = data.get("UserInfo", {}).get("TitleInfo", {}).get("DisplayName")
-            
-            return jsonify({
-                "message": f"Authenticated user {username}",
-                "userid": user_id.upper(),
-                "resultCode": 1,
-                "nickname": nickname,
-            }), 200
-        else:
-            return jsonify({
-                "message": "Failed to verify user",
-                "userid": None,
-                "resultCode": 0,
-                "nickname": None,
-            }), 401
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9080) # CREDITS TO S4GE :)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hatred's bio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --dark-blue: #00008B;
+      --mid-blue: #0a0a2e;
+      --accent: #9698ff;
+      --soft: #c5c6ff;
+      --bg: #05051a;
+      --card: rgba(10, 10, 60, 0.6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Quicksand', sans-serif;
+      color: #e0e0ff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--d) ease-in-out infinite;
+      opacity: 0;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: var(--o); }
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob1 { width: 400px; height: 400px; background: #00008B; top: -100px; left: -100px; animation: blobmove1 12s ease-in-out infinite; }
+    .blob2 { width: 300px; height: 300px; background: #9698ff; bottom: -80px; right: -80px; animation: blobmove2 15s ease-in-out infinite; }
+    .blob3 { width: 200px; height: 200px; background: #0000cd; top: 50%; left: 50%; animation: blobmove3 10s ease-in-out infinite; }
+    @keyframes blobmove1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
+    @keyframes blobmove2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-40px)} }
+    @keyframes blobmove3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
+
+    #enter-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      cursor: pointer;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #enter-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .enter-box {
+      border: 2px solid rgba(150,152,255,0.5);
+      border-radius: 16px;
+      padding: 32px 60px;
+      background: rgba(10,10,60,0.5);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseboxborder 2s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(150,152,255,0.15), inset 0 0 30px rgba(150,152,255,0.05);
+    }
+    @keyframes pulseboxborder {
+      0%,100% { box-shadow: 0 0 20px rgba(150,152,255,0.15), inset 0 0 20px rgba(150,152,255,0.05); border-color: rgba(150,152,255,0.4); }
+      50% { box-shadow: 0 0 50px rgba(150,152,255,0.35), inset 0 0 40px rgba(150,152,255,0.1); border-color: rgba(150,152,255,0.8); }
+    }
+    .enter-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 30px rgba(150,152,255,0.6), 0 0 60px rgba(150,152,255,0.3);
+      animation: pulsetitle 2s ease-in-out infinite;
+    }
+    @keyframes pulsetitle {
+      0%,100% { text-shadow: 0 0 30px rgba(150,152,255,0.6), 0 0 60px rgba(150,152,255,0.3); }
+      50% { text-shadow: 0 0 50px rgba(150,152,255,0.9), 0 0 100px rgba(150,152,255,0.5); }
+    }
+    .enter-border {
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(150,152,255,0.15);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    .enter-corner {
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.6;
+    }
+    .enter-corner.tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
+    .enter-corner.tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
+    .enter-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
+    .enter-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+
+    #mute-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 200;
+      background: rgba(10, 10, 50, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(150,152,255,0.3);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: #e0e0ff;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, border-color 0.2s, opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #mute-btn.visible { opacity: 1; pointer-events: all; }
+    #mute-btn:hover { background: rgba(20,20,80,0.9); border-color: var(--accent); }
+    .mute-icon { font-size: 1rem; }
+
+    #bio {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+    }
+    #bio.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bio-card {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(150,152,255,0.2);
+      border-radius: 24px;
+      padding: 40px 36px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 60px rgba(0,0,139,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .bio-header {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 28px;
+      text-shadow: 0 0 20px rgba(150,152,255,0.4);
+    }
+
+    .bio-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+      animation: fadein 0.6s ease both;
+    }
+    .bio-row:nth-child(2) { animation-delay: 0.1s; }
+    .bio-row:nth-child(3) { animation-delay: 0.2s; }
+    .bio-row:nth-child(4) { animation-delay: 0.3s; }
+    .bio-row:nth-child(5) { animation-delay: 0.4s; }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .bio-emoji {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .bio-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--soft);
+      opacity: 0.6;
+      margin-bottom: 2px;
+    }
+    .bio-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e8e8ff;
+    }
+    .bio-value.accent { color: var(--accent); }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(150,152,255,0.3), transparent);
+      margin: 8px 0 20px;
+    }
+
+    .lang-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .pill {
+      background: rgba(0,0,139,0.4);
+      border: 1px solid rgba(150,152,255,0.3);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--soft);
+      letter-spacing: 0.05em;
+    }
+
+    .bsf-input-wrap {
+      margin-top: 4px;
+    }
+    .bsf-text {
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
+  <div id="enter-screen" onclick="enterBio()">
+    <div class="enter-border"></div>
+    <div class="enter-corner tl"></div>
+    <div class="enter-corner tr"></div>
+    <div class="enter-corner bl"></div>
+    <div class="enter-corner br"></div>
+    <div class="enter-box">
+      <div class="enter-title">click here</div>
+    </div>
+  </div>
+
+  <button id="mute-btn" onclick="toggleMute()">
+    <span class="mute-icon" id="mute-icon">🔊</span>
+    <span id="mute-label">Mute</span>
+  </button>
+
+  <div id="bio">
+    <div class="bio-card">
+      <div class="bio-header">Welcome to Hatred's Bio</div>
+      <div class="divider"></div>
+
+      <div class="bio-row">
+        <span class="bio-emoji">💙</span>
+        <div>
+          <div class="bio-label">favorite color</div>
+          <div class="bio-value">dark blue</div>
+        </div>
+      </div>
+
+      <div class="bio-row">
+        <span class="bio-emoji">💙</span>
+        <div>
+          <div class="bio-label">name</div>
+          <div class="bio-value" style="color:#ff4444;">nala &lt;3</div>
+        </div>
+      </div>
+
+      <div class="bio-row">
+        <span class="bio-emoji">👾</span>
+        <div>
+          <div class="bio-label">coding languages</div>
+          <div class="lang-pills">
+            <span class="pill">C#</span>
+            <span class="pill">C++</span>
+            <span class="pill">Python</span>
+            <span class="pill">JSON</span>
+            <span class="pill">HTML</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bio-row">
+        <span class="bio-emoji">🎮</span>
+        <div>
+          <div class="bio-label">17 digit and fps/discord water mark and tutorial for it too&lt;3</div>
+          <div class="bio-value"><a href="https://gofile.io/d/M2rTaB" target="_blank" style="color:#00CCFF; text-decoration:none;">click here for 17 digit</a></div>
+          <div class="bio-value"><a href="https://youtu.be/he3msKrRrwk?si=a2en7E7oRAwQRgls" target="_blank" style="color:#FF0000; text-decoration:none;">click here for tutorial</a></div>
+        </div>
+      </div>
+
+      <div class="bio-row">
+        <span class="bio-emoji">🫂</span>
+        <div>
+          <div class="bio-label">best friends</div>
+          <div class="bsf-input-wrap">
+            <div class="bsf-text">Cammyapp, Z4eu, Vader, Desk, Hexa, L1rson, Rytec, Ella, Hexa, Auroraa </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="https://files.catbox.moe/8iel9m.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `
+        left: ${Math.random()*100}%;
+        top: ${Math.random()*100}%;
+        --d: ${2 + Math.random()*4}s;
+        --o: ${0.3 + Math.random()*0.7};
+        animation-delay: ${Math.random()*5}s;
+        width: ${1 + Math.random()*2}px;
+        height: ${1 + Math.random()*2}px;
+      `;
+      starsEl.appendChild(s);
+    }
+
+    const audio = document.getElementById('bg-music');
+    let muted = false;
+
+    function enterBio() {
+      document.getElementById('enter-screen').classList.add('hidden');
+      document.getElementById('bio').classList.add('visible');
+      document.getElementById('mute-btn').classList.add('visible');
+      audio.volume = 0.4;
+      audio.play().catch(() => {});
+    }
+
+    function toggleMute() {
+      muted = !muted;
+      audio.muted = muted;
+      document.getElementById('mute-icon').textContent = muted ? '🔇' : '🔊';
+      document.getElementById('mute-label').textContent = muted ? 'Unmute' : 'Mute';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') enterBio();
+    });
+  </script>
+</body>
+</html>
