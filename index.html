@@ -38,6 +38,8 @@
     width: 250px;
     transition: transform 0.2s ease;
     cursor: pointer;
+    text-decoration: none;
+    display: block;
   }
   .card:hover { transform: scale(1.04); }
   .card::before {
@@ -45,13 +47,7 @@
     position: absolute;
     inset: 0;
     border-radius: 6px;
-    background: linear-gradient(
-      90deg,
-      #ff0000, #ff7700, #ffff00, #00ff00,
-      #0077ff, #8800ff, #ff00ff, #ff0000,
-      #ff7700, #ffff00, #00ff00, #0077ff,
-      #8800ff, #ff00ff, #ff0000
-    );
+    background: linear-gradient(90deg,#ff0000,#ff7700,#ffff00,#00ff00,#0077ff,#8800ff,#ff00ff,#ff0000,#ff7700,#ffff00,#00ff00,#0077ff,#8800ff,#ff00ff,#ff0000);
     background-size: 300% 100%;
     animation: rainbow-spin 2s linear infinite;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -77,8 +73,7 @@
     text-align: center;
     text-transform: uppercase;
   }
-  .cashapp-btn {
-    display: inline-block;
+  .view-btn {
     background: #00D632;
     color: #000;
     font-family: 'Rajdhani', sans-serif;
@@ -87,11 +82,8 @@
     letter-spacing: 1px;
     padding: 7px 18px;
     border-radius: 4px;
-    text-decoration: none;
     text-transform: uppercase;
-    transition: opacity 0.15s;
   }
-  .cashapp-btn:hover { opacity: 0.85; }
   .donate-btn {
     display: inline-block;
     background: #ff4d4d;
@@ -115,35 +107,29 @@
     letter-spacing: 0.5px;
     line-height: 1.5;
   }
-  .heart {
-    font-size: 20px;
-    line-height: 1;
-  }
+  .heart { font-size: 20px; line-height: 1; }
 </style>
 </head>
 <body>
 <p class="shop-title">Store</p>
 
-<!-- BUY FP -->
-<div class="card" id="BUYFP">
+<a class="card" href="fp.html">
   <div class="card-inner">
-    <span class="card-title">Buy Finger Painter For $5</span>
-    <a class="cashapp-btn" href="https://cash.app/$avielsamueljs" target="_blank">Pay via CashApp</a>
+    <span class="card-title">Buy FP</span>
+    <span class="view-btn">View Product</span>
     <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
   </div>
-</div>
+</a>
 
-<!-- BUY EVERYCOSMETIC -->
-<div class="card" id="BUYEVERYCOSMETIC">
+<a class="card" href="everycosmetic.html">
   <div class="card-inner">
-    <span class="card-title">Buy Every Cosmetic For $15</span>
-    <a class="cashapp-btn" href="https://cash.app/$avielsamueljs" target="_blank">Pay via CashApp</a>
+    <span class="card-title">Buy Every Cosmetic</span>
+    <span class="view-btn">View Product</span>
     <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
   </div>
-</div>
+</a>
 
-<!-- DONATE -->
-<div class="card" id="DONATE">
+<div class="card" style="cursor:default;">
   <div class="card-inner">
     <span class="heart">❤️</span>
     <span class="card-title">Donate</span>
@@ -151,21 +137,5 @@
     <p class="notice">Support the CCU — any amount<br>is appreciated. Thank you!</p>
   </div>
 </div>
-
-<script>
-  const path = window.location.pathname;
-  const match = path.match(/\/api\/([A-Z]+)/i);
-  if (match) {
-    const target = match[1].toUpperCase();
-    const el = document.getElementById(target);
-    if (el) {
-      setTimeout(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.style.transform = 'scale(1.07)';
-        setTimeout(() => el.style.transform = '', 600);
-      }, 200);
-    }
-  }
-</script>
 </body>
 </html>
