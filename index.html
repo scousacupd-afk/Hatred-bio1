@@ -1,386 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hatred's bio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --dark-blue: #00008B;
-      --mid-blue: #0a0a2e;
-      --accent: #9698ff;
-      --soft: #c5c6ff;
-      --bg: #05051a;
-      --card: rgba(10, 10, 60, 0.6);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Share+Tech+Mono&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: var(--bg);
-      font-family: 'Quicksand', sans-serif;
-      color: #e0e0ff;
-      min-height: 100vh;
-      overflow: hidden;
-    }
+  body {
+    background: #000;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    gap: 24px;
+    padding: 40px 20px;
+  }
 
-    .stars {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle var(--d) ease-in-out infinite;
-      opacity: 0;
-    }
-    @keyframes twinkle {
-      0%, 100% { opacity: 0; }
-      50% { opacity: var(--o); }
-    }
+  .shop-title {
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+    opacity: 0.3;
+    margin-bottom: 4px;
+  }
 
-    .blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.15;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .blob1 { width: 400px; height: 400px; background: #00008B; top: -100px; left: -100px; animation: blobmove1 12s ease-in-out infinite; }
-    .blob2 { width: 300px; height: 300px; background: #9698ff; bottom: -80px; right: -80px; animation: blobmove2 15s ease-in-out infinite; }
-    .blob3 { width: 200px; height: 200px; background: #0000cd; top: 50%; left: 50%; animation: blobmove3 10s ease-in-out infinite; }
-    @keyframes blobmove1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,30px)} }
-    @keyframes blobmove2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,-40px)} }
-    @keyframes blobmove3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
+  @keyframes rainbow-spin {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
 
-    #enter-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      cursor: pointer;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
-    }
-    #enter-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    .enter-box {
-      border: 2px solid rgba(150,152,255,0.5);
-      border-radius: 16px;
-      padding: 32px 60px;
-      background: rgba(10,10,60,0.5);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pulseboxborder 2s ease-in-out infinite;
-      box-shadow: 0 0 30px rgba(150,152,255,0.15), inset 0 0 30px rgba(150,152,255,0.05);
-    }
-    @keyframes pulseboxborder {
-      0%,100% { box-shadow: 0 0 20px rgba(150,152,255,0.15), inset 0 0 20px rgba(150,152,255,0.05); border-color: rgba(150,152,255,0.4); }
-      50% { box-shadow: 0 0 50px rgba(150,152,255,0.35), inset 0 0 40px rgba(150,152,255,0.1); border-color: rgba(150,152,255,0.8); }
-    }
-    .enter-title {
-      font-family: 'Nunito', sans-serif;
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      text-shadow: 0 0 30px rgba(150,152,255,0.6), 0 0 60px rgba(150,152,255,0.3);
-      animation: pulsetitle 2s ease-in-out infinite;
-    }
-    @keyframes pulsetitle {
-      0%,100% { text-shadow: 0 0 30px rgba(150,152,255,0.6), 0 0 60px rgba(150,152,255,0.3); }
-      50% { text-shadow: 0 0 50px rgba(150,152,255,0.9), 0 0 100px rgba(150,152,255,0.5); }
-    }
-    .enter-border {
-      position: absolute;
-      inset: 20px;
-      border: 1px solid rgba(150,152,255,0.15);
-      border-radius: 20px;
-      pointer-events: none;
-    }
-    .enter-corner {
-      position: absolute;
-      width: 20px; height: 20px;
-      border-color: var(--accent);
-      border-style: solid;
-      opacity: 0.6;
-    }
-    .enter-corner.tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
-    .enter-corner.tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
-    .enter-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
-    .enter-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+  .card {
+    position: relative;
+    border-radius: 6px;
+    padding: 2px;
+    width: 250px;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
 
-    #mute-btn {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 200;
-      background: rgba(10, 10, 50, 0.75);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(150,152,255,0.3);
-      border-radius: 10px;
-      padding: 8px 14px;
-      color: #e0e0ff;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.2s, border-color 0.2s, opacity 0.3s;
-      opacity: 0;
-      pointer-events: none;
-    }
-    #mute-btn.visible { opacity: 1; pointer-events: all; }
-    #mute-btn:hover { background: rgba(20,20,80,0.9); border-color: var(--accent); }
-    .mute-icon { font-size: 1rem; }
+  .card:hover { transform: scale(1.04); }
 
-    #bio {
-      position: relative;
-      z-index: 10;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
-    }
-    #bio.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      #ff0000, #ff7700, #ffff00, #00ff00,
+      #0077ff, #8800ff, #ff00ff, #ff0000,
+      #ff7700, #ffff00, #00ff00, #0077ff,
+      #8800ff, #ff00ff, #ff0000
+    );
+    background-size: 300% 100%;
+    animation: rainbow-spin 2s linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 
-    .bio-card {
-      background: var(--card);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(150,152,255,0.2);
-      border-radius: 24px;
-      padding: 40px 36px;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 8px 60px rgba(0,0,139,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
+  .card-inner {
+    background: #0d0d0d;
+    border-radius: 4px;
+    padding: 20px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
 
-    .bio-header {
-      font-family: 'Nunito', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 28px;
-      text-shadow: 0 0 20px rgba(150,152,255,0.4);
-    }
+  .card-title {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+  }
 
-    .bio-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 20px;
-      animation: fadein 0.6s ease both;
-    }
-    .bio-row:nth-child(2) { animation-delay: 0.1s; }
-    .bio-row:nth-child(3) { animation-delay: 0.2s; }
-    .bio-row:nth-child(4) { animation-delay: 0.3s; }
-    .bio-row:nth-child(5) { animation-delay: 0.4s; }
-    @keyframes fadein {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
+  .cashapp-btn {
+    display: inline-block;
+    background: #00D632;
+    color: #000;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 7px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: opacity 0.15s;
+  }
 
-    .bio-emoji {
-      font-size: 1.3rem;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .bio-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--soft);
-      opacity: 0.6;
-      margin-bottom: 2px;
-    }
-    .bio-value {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e8e8ff;
-    }
-    .bio-value.accent { color: var(--accent); }
+  .cashapp-btn:hover { opacity: 0.85; }
 
-    .divider {
-      height: 1px;
-      background: linear-gradient(to right, transparent, rgba(150,152,255,0.3), transparent);
-      margin: 8px 0 20px;
-    }
-
-    .lang-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .pill {
-      background: rgba(0,0,139,0.4);
-      border: 1px solid rgba(150,152,255,0.3);
-      border-radius: 20px;
-      padding: 3px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--soft);
-      letter-spacing: 0.05em;
-    }
-
-    .bsf-input-wrap {
-      margin-top: 4px;
-    }
-    .bsf-text {
-      font-size: 0.95rem;
-      color: #ffffff;
-      font-style: normal;
-    }
-  </style>
+  .notice {
+    color: #888;
+    font-size: 11px;
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+  }
+</style>
 </head>
 <body>
 
-  <div class="stars" id="stars"></div>
-  <div class="blob blob1"></div>
-  <div class="blob blob2"></div>
-  <div class="blob blob3"></div>
+<p class="shop-title">Store</p>
 
-  <div id="enter-screen" onclick="enterBio()">
-    <div class="enter-border"></div>
-    <div class="enter-corner tl"></div>
-    <div class="enter-corner tr"></div>
-    <div class="enter-corner bl"></div>
-    <div class="enter-corner br"></div>
-    <div class="enter-box">
-      <div class="enter-title">click here</div>
-    </div>
+<!-- BUY FP -->
+<div class="card" id="BUYFP">
+  <div class="card-inner">
+    <span class="card-title">Buy FP</span>
+    <a class="cashapp-btn" href="https://cash.app/$YOURCASHAPP" target="_blank">Pay via CashApp</a>
+    <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
   </div>
+</div>
 
-  <button id="mute-btn" onclick="toggleMute()">
-    <span class="mute-icon" id="mute-icon">🔊</span>
-    <span id="mute-label">Mute</span>
-  </button>
-
-  <div id="bio">
-    <div class="bio-card">
-      <div class="bio-header">Welcome to Hatred's Bio</div>
-      <div class="divider"></div>
-
-      <div class="bio-row">
-        <span class="bio-emoji">💙</span>
-        <div>
-          <div class="bio-label">favorite color</div>
-          <div class="bio-value">dark blue</div>
-        </div>
-      </div>
-
-      <div class="bio-row">
-        <span class="bio-emoji">💙</span>
-        <div>
-          <div class="bio-label">name</div>
-          <div class="bio-value" style="color:#ff4444;">nala &lt;3</div>
-        </div>
-      </div>
-
-      <div class="bio-row">
-        <span class="bio-emoji">👾</span>
-        <div>
-          <div class="bio-label">coding languages</div>
-          <div class="lang-pills">
-            <span class="pill">C#</span>
-            <span class="pill">C++</span>
-            <span class="pill">Python</span>
-            <span class="pill">JSON</span>
-            <span class="pill">HTML</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bio-row">
-        <span class="bio-emoji">🎮</span>
-        <div>
-          <div class="bio-label">17 digit and fps/discord water mark, fps/discord water mark animated version and tutorial for it too&lt;3</div>
-          <div class="bio-value"><a href="https://gofile.io/d/M2rTaB" target="_blank" style="color:#00CCFF; text-decoration:none;">click here for 17 digit and both discord water marks</a></div>
-          <div class="bio-value"><a href="https://youtu.be/he3msKrRrwk?si=a2en7E7oRAwQRgls" target="_blank" style="color:#FF0000; text-decoration:none;">click here for tutorial</a></div>
-        </div>
-      </div>
-
-      <div class="bio-row">
-        <span class="bio-emoji">🫂</span>
-        <div>
-          <div class="bio-label">best friends</div>
-          <div class="bsf-input-wrap">
-            <div class="bsf-text">Cammyapp, Z4eu, Vader, Desk, Hexa, Rytec, Ella, Hexa </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- BUY EVERYCOSMETIC -->
+<div class="card" id="BUYEVERYCOSMETIC">
+  <div class="card-inner">
+    <span class="card-title">Buy Every Cosmetic</span>
+    <a class="cashapp-btn" href="https://cash.app/$YOURCASHAPP" target="_blank">Pay via CashApp</a>
+    <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
   </div>
+</div>
 
-  <audio id="bg-music" loop>
-    <source src="https://files.catbox.moe/8iel9m.mp3" type="audio/mpeg">
-  </audio>
-
-  <script>
-    const starsEl = document.getElementById('stars');
-    for (let i = 0; i < 120; i++) {
-      const s = document.createElement('div');
-      s.className = 'star';
-      s.style.cssText = `
-        left: ${Math.random()*100}%;
-        top: ${Math.random()*100}%;
-        --d: ${2 + Math.random()*4}s;
-        --o: ${0.3 + Math.random()*0.7};
-        animation-delay: ${Math.random()*5}s;
-        width: ${1 + Math.random()*2}px;
-        height: ${1 + Math.random()*2}px;
-      `;
-      starsEl.appendChild(s);
+<script>
+  const path = window.location.pathname;
+  const match = path.match(/\/api\/([A-Z]+)/i);
+  if (match) {
+    const target = match[1].toUpperCase();
+    const el = document.getElementById(target);
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transform = 'scale(1.07)';
+        setTimeout(() => el.style.transform = '', 600);
+      }, 200);
     }
-
-    const audio = document.getElementById('bg-music');
-    let muted = false;
-
-    function enterBio() {
-      document.getElementById('enter-screen').classList.add('hidden');
-      document.getElementById('bio').classList.add('visible');
-      document.getElementById('mute-btn').classList.add('visible');
-      audio.volume = 0.4;
-      audio.play().catch(() => {});
-    }
-
-    function toggleMute() {
-      muted = !muted;
-      audio.muted = muted;
-      document.getElementById('mute-icon').textContent = muted ? '🔇' : '🔊';
-      document.getElementById('mute-label').textContent = muted ? 'Unmute' : 'Mute';
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') enterBio();
-    });
-  </script>
+  }
+</script>
 </body>
 </html>
