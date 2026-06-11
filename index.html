@@ -3,139 +3,457 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop</title>
+<title>@l1r_son</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Share+Tech+Mono&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Rajdhani', sans-serif;
-    gap: 24px;
-    padding: 40px 20px;
+
+  :root {
+    --red:    #e0142a;
+    --blue:   #1565ff;
+    --purple: #8b00ff;
+    --glow-r: rgba(224,20,42,0.6);
+    --glow-b: rgba(21,101,255,0.6);
+    --glow-p: rgba(139,0,255,0.6);
+    --bg:     #020008;
+    --text:   #d9d0ff;
   }
-  .shop-title {
-    color: #fff;
-    font-size: 11px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
     font-family: 'Share Tech Mono', monospace;
-    opacity: 0.3;
-    margin-bottom: 4px;
+    cursor: none;
+    overflow: hidden;
   }
-  @keyframes rainbow-spin {
-    0%   { background-position: 0% 50%; }
-    100% { background-position: 300% 50%; }
+
+  /* ── CUSTOM CROSSHAIR CURSOR ── */
+  #cursor {
+    position: fixed;
+    width: 48px; height: 48px;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s linear;
   }
-  .card {
+  #cursor svg { width: 100%; height: 100%; }
+
+  /* ── STAR FIELD ── */
+  canvas#stars {
+    position: fixed; inset: 0;
+    z-index: 0;
+  }
+
+  /* ── SCANLINES OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── LANDING (click prompt) ── */
+  #landing {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10;
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  #landing.hidden { opacity: 0; visibility: hidden; }
+
+  .click-ring {
     position: relative;
-    border-radius: 6px;
-    padding: 2px;
-    width: 250px;
-    transition: transform 0.2s ease;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
+    width: 140px; height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none;
   }
-  .card:hover { transform: scale(1.04); }
-  .card::before {
+  .click-ring::before, .click-ring::after {
     content: '';
     position: absolute;
-    inset: 0;
-    border-radius: 6px;
-    background: linear-gradient(90deg,#ff0000,#ff7700,#ffff00,#00ff00,#0077ff,#8800ff,#ff00ff,#ff0000,#ff7700,#ffff00,#00ff00,#0077ff,#8800ff,#ff00ff,#ff0000);
-    background-size: 300% 100%;
-    animation: rainbow-spin 2s linear infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    border-radius: 50%;
+    border: 2px solid;
+    animation: pulse-ring 2s ease-out infinite;
   }
-  .card-inner {
-    background: #0d0d0d;
-    border-radius: 4px;
-    padding: 20px 22px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  .click-ring::before {
+    width: 140px; height: 140px;
+    border-color: var(--blue);
+    animation-delay: 0s;
   }
-  .card-title {
+  .click-ring::after {
+    width: 110px; height: 110px;
+    border-color: var(--purple);
+    animation-delay: 0.5s;
+  }
+  @keyframes pulse-ring {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+
+  .click-inner {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--purple) 0%, var(--blue) 60%, transparent 100%);
+    box-shadow: 0 0 24px var(--glow-p), 0 0 8px var(--glow-b);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
     color: #fff;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: 2px;
     text-align: center;
-    text-transform: uppercase;
-  }
-  .view-btn {
-    background: #00D632;
-    color: #000;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
     letter-spacing: 1px;
-    padding: 7px 18px;
-    border-radius: 4px;
-    text-transform: uppercase;
+    z-index: 1;
   }
-  .donate-btn {
+
+  .click-label {
+    margin-top: 22px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--text);
+    text-shadow: 0 0 8px var(--glow-p);
+    animation: blink 1.4s steps(1) infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* ── BIO PANEL ── */
+  #bio {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.7s ease, visibility 0.7s;
+  }
+  #bio.visible { opacity: 1; visibility: visible; }
+
+  .bio-card {
+    position: relative;
+    width: min(580px, 92vw);
+    padding: 40px 36px 32px;
+    background: rgba(2,0,14,0.85);
+    border: 1px solid rgba(139,0,255,0.4);
+    box-shadow:
+      0 0 0 1px rgba(21,101,255,0.2),
+      0 0 40px rgba(139,0,255,0.25),
+      inset 0 0 60px rgba(21,101,255,0.05);
+    backdrop-filter: blur(6px);
+  }
+
+  /* corner accents */
+  .bio-card::before, .bio-card::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+  }
+  .bio-card::before {
+    top: -1px; left: -1px;
+    border-top: 2px solid var(--red);
+    border-left: 2px solid var(--red);
+  }
+  .bio-card::after {
+    bottom: -1px; right: -1px;
+    border-bottom: 2px solid var(--blue);
+    border-right: 2px solid var(--blue);
+  }
+
+  .handle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--red), var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    filter: drop-shadow(0 0 10px var(--glow-p));
+    margin-bottom: 4px;
+  }
+
+  .tagline {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(200,180,255,0.55);
+    margin-bottom: 28px;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), var(--blue), transparent);
+    margin-bottom: 22px;
+    opacity: 0.5;
+  }
+
+  .bio-text {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .cross-icon {
     display: inline-block;
-    background: #ff4d4d;
-    color: #fff;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 1px;
-    padding: 7px 18px;
-    border-radius: 4px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: opacity 0.15s;
+    color: var(--blue);
+    text-shadow: 0 0 6px var(--glow-b);
+    font-size: 15px;
+    vertical-align: middle;
   }
-  .donate-btn:hover { opacity: 0.85; }
-  .notice {
-    color: #888;
-    font-size: 11px;
-    font-family: 'Share Tech Mono', monospace;
+
+  .reals-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
     text-align: center;
-    letter-spacing: 0.5px;
-    line-height: 1.5;
+    margin-bottom: 10px;
+    text-shadow: 0 0 6px var(--glow-r);
   }
-  .heart { font-size: 20px; line-height: 1; }
+
+  .reals-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .real-tag {
+    padding: 4px 12px;
+    border: 1px solid;
+    font-size: 11px;
+    letter-spacing: 2px;
+    border-radius: 2px;
+    transition: box-shadow 0.2s;
+  }
+  .real-tag:nth-child(3n+1) { border-color: var(--red); color: #ff6070; }
+  .real-tag:nth-child(3n+2) { border-color: var(--purple); color: #c87fff; }
+  .real-tag:nth-child(3n)   { border-color: var(--blue); color: #7ab0ff; }
+  .real-tag:hover { box-shadow: 0 0 8px currentColor; }
+
+  /* ── MUSIC PLAYER BAR ── */
+  .music-bar {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(139,0,255,0.25);
+    padding: 10px 14px;
+    border-radius: 4px;
+  }
+
+  .music-info {
+    flex: 1;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(200,180,255,0.7);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .music-info span {
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+  }
+
+  .mute-btn {
+    background: none;
+    border: 1px solid var(--purple);
+    color: var(--text);
+    padding: 5px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: none;
+    border-radius: 2px;
+    transition: background 0.2s, box-shadow 0.2s;
+    flex-shrink: 0;
+  }
+  .mute-btn:hover {
+    background: rgba(139,0,255,0.2);
+    box-shadow: 0 0 10px var(--glow-p);
+  }
+
+  /* hidden spotify iframe */
+  #spotify-frame { display: none; }
+
+  /* ── GLITCH ANIMATION ON HANDLE ── */
+  @keyframes glitch {
+    0%   { clip-path: inset(0 0 95% 0); transform: translate(-3px,0); }
+    20%  { clip-path: inset(60% 0 20% 0); transform: translate(3px,0); }
+    40%  { clip-path: inset(30% 0 50% 0); transform: translate(-2px,0); }
+    60%  { clip-path: inset(80% 0 5% 0); transform: translate(2px,0); }
+    80%  { clip-path: inset(10% 0 80% 0); transform: translate(-3px,0); }
+    100% { clip-path: inset(0 0 95% 0); transform: translate(0,0); }
+  }
+  .handle::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 0; top: 0; width: 100%;
+    background: linear-gradient(90deg, var(--red), var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glitch 4s infinite steps(1);
+    opacity: 0.6;
+  }
+  .handle { position: relative; }
+
 </style>
 </head>
 <body>
-<p class="shop-title">Store</p>
 
-<a class="card" href="https://classic-tag-finger-painter.vercel.app/">
-  <div class="card-inner">
-    <span class="card-title">Buy FP</span>
-    <span class="view-btn">View Product</span>
-    <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
+<!-- Cursor -->
+<div id="cursor">
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- outer circle -->
+    <circle cx="24" cy="24" r="18" stroke="#8b00ff" stroke-width="1.5"/>
+    <!-- inner circle -->
+    <circle cx="24" cy="24" r="10" stroke="#1565ff" stroke-width="1"/>
+    <!-- crosshair lines -->
+    <line x1="24" y1="0"  x2="24" y2="12" stroke="#e0142a" stroke-width="1.8"/>
+    <line x1="24" y1="36" x2="24" y2="48" stroke="#e0142a" stroke-width="1.8"/>
+    <line x1="0"  y1="24" x2="12" y2="24" stroke="#e0142a" stroke-width="1.8"/>
+    <line x1="36" y1="24" x2="48" y2="24" stroke="#e0142a" stroke-width="1.8"/>
+    <!-- center dot -->
+    <circle cx="24" cy="24" r="1.5" fill="#fff"/>
+  </svg>
+</div>
+
+<!-- Stars -->
+<canvas id="stars"></canvas>
+
+<!-- Landing -->
+<div id="landing" onclick="openBio()">
+  <div class="click-ring">
+    <div class="click-inner">CLICK</div>
   </div>
-</a>
+  <div class="click-label">[ CLICK TO OPEN BIO ]</div>
+</div>
 
-<a class="card" href="https://classic-tag-everycosmetic.vercel.app">
-  <div class="card-inner">
-    <span class="card-title">Buy Every Cosmetic</span>
-    <span class="view-btn">View Product</span>
-    <p class="notice">Once purchased, make a ticket<br>in the discord.</p>
-  </div>
-</a>
+<!-- Bio -->
+<div id="bio">
+  <div class="bio-card">
+    <div class="handle" data-text="@data.structures">@data.structures</div>
+    <div class="tagline">https://Pornhub.com</div>
+    <div class="divider"></div>
+    <p class="bio-text">
+      <span class="cross-icon">✚</span>
+     Yo im Horny and shi C++, C#, Py, Js, HTML, lua
+     Yes this bio was made with ai idgaf nga
+    </p>
+    <div class="reals-label">😶‍🌫️ REAL NIGGERS 😶‍🌫️</div>
+    <div class="reals-grid">
+      <span class="real-tag">Cammyapp</span>
+      <span class="real-tag">Aurora</span>
+      <span class="real-tag">isaac</span>
+      <span class="real-tag">Fletcher</span>
+      <span class="real-tag">ralph</span>
+      <span class="real-tag">Ashton</span>
+      <span class="real-tag">Ken</span>
+      <span class="real-tag">Vader</span>
+      <span class="real-tag">DESKK</span>
+    </div>
 
-<div class="card" style="cursor:default;">
-  <div class="card-inner">
-    <span class="heart">❤️</span>
-    <span class="card-title">Donate</span>
-    <a class="donate-btn" href="https://cash.app/$avielsamueljs" target="_blank">Donate via CashApp</a>
-    <p class="notice">Support the CCU — any amount<br>is appreciated. Thank you!</p>
+    <div class="music-bar">
+      <div class="music-info">
+        🎵 <span>NOW PLAYING</span> · Slaughter House
+      </div>
+      <button class="mute-btn" id="muteBtn" onclick="toggleMute()">MUTE</button>
+    </div>
   </div>
 </div>
+
+<!-- Spotify embed (hidden, audio only) -->
+<iframe id="spotify-frame"
+  src="https://open.spotify.com/embed/track/1FlOHhlBsJhfv8K4cttbVE?autoplay=1"
+  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+  loading="lazy">
+</iframe>
+
+<script>
+  /* ── Cursor ── */
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  /* ── Stars ── */
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function initStars() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    stars = Array.from({length: 160}, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random(),
+      s: Math.random() * 0.003 + 0.001
+    }));
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => {
+      s.a += s.s;
+      if (s.a > 1) s.s *= -1;
+      if (s.a < 0) s.s *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,160,255,${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', initStars);
+  initStars(); drawStars();
+
+  /* ── Bio open ── */
+  function openBio() {
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('bio').classList.add('visible');
+    // make iframe visible to let spotify play
+    document.getElementById('spotify-frame').style.display = 'block';
+    document.getElementById('spotify-frame').style.position = 'absolute';
+    document.getElementById('spotify-frame').style.opacity  = '0';
+    document.getElementById('spotify-frame').style.pointerEvents = 'none';
+    document.getElementById('spotify-frame').style.width = '1px';
+    document.getElementById('spotify-frame').style.height = '1px';
+  }
+
+  /* ── Mute ── */
+  let muted = false;
+  function toggleMute() {
+    const frame = document.getElementById('spotify-frame');
+    const btn   = document.getElementById('muteBtn');
+    muted = !muted;
+    // Reload with muted param - Spotify embed doesn't expose volume API
+    // so we swap the src query param
+    const base = 'https://open.spotify.com/embed/track/1FlOHhlBsJhfv8K4cttbVE';
+    frame.src = muted
+      ? base  // no autoplay = effectively muted on reload
+      : base + '?autoplay=1';
+    btn.textContent = muted ? 'UNMUTE' : 'MUTE';
+    btn.style.borderColor = muted ? '#e0142a' : '#8b00ff';
+  }
+</script>
 </body>
 </html>
